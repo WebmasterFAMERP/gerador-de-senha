@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerador de Senha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-6 rounded-lg shadow-md w-96">
+      <h1 class="text-xl font-bold text-center mb-4">Gerador de Senhas</h1>
+      
+      <label for="quantidadeSenhas" class="block font-medium">Quantidade de Senhas:</label>
+      <input
+        type="number"
+        id="quantidadeSenhas"
+        value="20"
+        min="1"
+        class="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-200 mb-4"
+      />
+
+      <button
+        id="enviar"
+        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+      >
+        Gerar e Exportar
+      </button>
+
+      <p class="mt-4 font-semibold text-center">
+        Total de senhas geradas: <span id="total-senhas" class="text-blue-500">0</span>
+      </p>
+
+      <div id="senhasLista" class="mt-4 space-y-1 text-center text-sm text-gray-700"></div>
+    </div>
+
+    <script>
+      function gerarSenhaAlfanumerica(tamanho) {
+        const caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let senha = "";
+
+        for (let i = 0; i < tamanho; i++) {
+          const randomIndex = Math.floor(Math.random() * caracteres.length);
+          senha += caracteres.charAt(randomIndex);
+        }
+
+        return senha;
+      }
+
+      function criarArquivoSenhas(senhas) {
+        const conteudoArquivo = senhas.join("\n");
+        const arquivoBlob = new Blob([conteudoArquivo], { type: "text/plain" });
+        const linkDownload = document.createElement("a");
+        linkDownload.href = URL.createObjectURL(arquivoBlob);
+        linkDownload.download = "senhas.txt";
+
+        document.body.appendChild(linkDownload);
+        linkDownload.click();
+        document.body.removeChild(linkDownload);
+      }
+
+      function gerarSenhas() {
+        const quantidadeSenhas = parseInt(document.getElementById("quantidadeSenhas").value);
+        const tamanhoSenha = 8;
+        const senhasGeradas = [];
+
+        for (let i = 0; i < quantidadeSenhas; i++) {
+          senhasGeradas.push(gerarSenhaAlfanumerica(tamanhoSenha));
+        }
+
+        const senhasLista = document.getElementById("senhasLista");
+        const totalSenhasElement = document.getElementById("total-senhas");
+
+        senhasLista.innerHTML = "";
+
+        senhasGeradas.forEach((senha) => {
+          const p = document.createElement("p");
+          p.textContent = senha;
+          senhasLista.appendChild(p);
+        });
+
+        totalSenhasElement.textContent = quantidadeSenhas;
+        criarArquivoSenhas(senhasGeradas);
+      }
+
+      document.getElementById("enviar").addEventListener("click", gerarSenhas);
+    </script>
+  </body>
+</html>
